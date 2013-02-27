@@ -1,0 +1,33 @@
+# emacs temp files
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+
+# vim temp files
+.*.sw[a-z]
+*.un~
+
+# build output
+a.out.dSYM
+*.[oa]
+*.d
+roll
+
+# autotools
+Makefile
+/config.status
+/autom4te.cache
+/aclocal.m4
+/compile
+/configure
+/depcomp
+/install-sh
+/missing
+/config.h
+/config.log
+/autoscan.log
+/configure.scan
