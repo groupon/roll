@@ -107,9 +107,9 @@
     "  -b, --profiled    write bash local_profiled here (default " LOCAL_PROFILED_FILENAME ")\n" \
     "  -c, --configdir   put generated config files here (default " CONFIG_DIR ")\n" \
     "  -o, --logfile     log here (default " LOG_DIR_ROOT "/" LOG_DIR_SUBDIR "/roll.{date}.log)\n" \
-    "  -p, --pidfile     store PID here (default " PID_FILE ")\n" \
     "  -x, --proxy       optional HTTP Proxy specified as: proxyhost[:port]\n" \
-    "  -p, --pidfile     store PID here (default " PID_FILE ")\n"
+    "  -p, --pidfile     store PID here (default " PID_FILE ")\n" \
+    "  -r, --prune       delete unused packages from previous installations\n" \
 /*  Don't advertise --dryrun since some steps will still do things to the system.  It's   */
 /*  still useful for testing.  So it remains as a hidden feature.                         */
 /*  "  -n, --dryrun      just print what would happen for some things\n" \                */
@@ -117,6 +117,7 @@
 typedef struct options_t_s {
     int failsafe;
     int dryrun;
+    int prune;
     char *base_url;
     char *package_dir;
     char *local_initd_file;
@@ -132,11 +133,12 @@ typedef struct options_t_s {
 static int parse_commandline (int argc, char *argv[], options_t *options) {
     int ch;
 
-    static const char shortopts[] = "hfnu:d:i:b:c:o:p:x:";
+    static const char shortopts[] = "hfrnu:d:i:b:c:o:p:x:";
     static struct option longopts[] = {
         { "help",         no_argument,       NULL, 'h' },
         { "failsafe",     no_argument,       NULL, 'f' },
         { "dryrun",       no_argument,       NULL, 'n' },
+        { "prune",        no_argument,       NULL, 'r' },
         { "baseurl",      required_argument, NULL, 'u' },
         { "packagedir",   required_argument, NULL, 'd' },
         { "initd",        required_argument, NULL, 'i' },
@@ -159,6 +161,9 @@ static int parse_commandline (int argc, char *argv[], options_t *options) {
             break;
         case 'n':
             options->dryrun = 1;
+            break;
+        case 'r':
+            options->prune = 1;
             break;
         case 'u':
             options->base_url = optarg;
@@ -277,6 +282,7 @@ int main(int argc, char *argv[]) {
     int pid_file_fd = -1;
     int try_failsafe = 0;
     int failsafe_mode = 0;
+    int prune_packages = 0;
     int report_errors = 0;
     FILE *hostclass_file = NULL,
          *host_file = NULL;
@@ -349,6 +355,10 @@ int main(int argc, char *argv[]) {
 
     if(options.failsafe) {
         failsafe_mode = 1;
+    }
+
+    if(options.prune) {
+      prune_packages = 1;
     }
 
     if(!(options.dryrun || has_root_privileges())) {
@@ -716,6 +726,11 @@ int main(int argc, char *argv[]) {
         clean_previous_package_trees(package_target_dir,
                                      options.dryrun ? temp_package_link_dir : package_link_dir,
                                      previous_package_link_dir);
+        if(prune_packages) {
+          log_info("Removing unused packages from prior installations.");
+          clean_previous_packages(hostclass_config.package_list,
+                                  package_stow_dir);
+        }
     } else {
         log_info("Not removing package target directories from prior installations in failsafe mode.");
     }

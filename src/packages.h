@@ -57,6 +57,9 @@ int clean_previous_package_trees(const char *package_target_dir,
                                  const char *package_link_dir,
                                  const char *previous_package_link_dir);
 
+int clean_previous_packages(const package_spec_t *package_list,
+                            const char *package_stow_dir);
+
 #ifdef __cplusplus
 }
 #endif
