@@ -726,7 +726,10 @@ int main(int argc, char *argv[]) {
         clean_previous_package_trees(package_target_dir,
                                      options.dryrun ? temp_package_link_dir : package_link_dir,
                                      previous_package_link_dir);
-        if(prune_packages) {
+        if(options.dryrun) {
+          log_info("Skipping package prune in dry run mode");
+        }
+        else if (prune_packages) {
           log_info("Removing unused packages from prior installations.");
           clean_previous_packages(hostclass_config.package_list,
                                   package_stow_dir);
