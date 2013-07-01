@@ -356,3 +356,40 @@ int clean_previous_package_trees(const char *package_target_dir,
         closedir(dp);
     return result;
 }
+
+int clean_previous_packages(const package_spec_t *package_list,
+                            const char *package_stow_dir)
+{
+    const package_spec_t *cp;
+    int included = 0;
+    DIR *existing_packages;
+    struct dirent *package;
+    char full_pathname[PATH_MAX];
+
+    existing_packages = opendir(package_stow_dir);
+    if (existing_packages != NULL) {
+
+        while(NULL != (package = readdir(existing_packages))) {
+           included = 0;
+           for(cp = package_list; cp; cp = cp->next) {
+               if(0 == strcmp(package->d_name, (char *)cp->package_name) &&
+                   package->d_name[0] != '.')
+               {
+                   included = 1;
+                   break;
+               }
+           }
+
+           if(!included && package->d_name[0] != '.') {
+               snprintf(full_pathname, PATH_MAX, "%s/%s", package_stow_dir, package->d_name);
+               log_info("    Removing package %s", package->d_name);
+               if(!rmrf(full_pathname)) {
+                   log_info("    Cannot remove directory %s; ignoring error",
+                       full_pathname);
+               }
+           }
+        }
+    }
+
+    return 0;
+}
