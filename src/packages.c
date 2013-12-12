@@ -213,6 +213,7 @@ static int stow_package(const char *epkg,
     exit_code =
         run_command(epkg,
                     "-i",     /* install mode */
+                    "-a",     /* absolute symlinks */
                     "-p",     /* don't perform pre-requisite checking */
                     "-R",     /* don't run package scripts */
                     "-S",     /* disable versioning */
