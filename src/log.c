@@ -74,7 +74,7 @@ static void log_timestamp() {
                 ltm.tm_min,
                 ltm.tm_sec,
                 ltm.tm_zone);
-    fprintf(stderr,
+    fprintf(stdout,
             "[%04d-%02d-%02d %02d:%02d:%02d %s] ",
             ltm.tm_year + 1900,
             ltm.tm_mon + 1,
@@ -83,6 +83,7 @@ static void log_timestamp() {
             ltm.tm_min,
             ltm.tm_sec,
             ltm.tm_zone);
+    fflush(stdout);
 }
 
 int log_init(char *filename, char *linkname) {
@@ -187,7 +188,7 @@ void log_message(const char *format, ...) {
     va_copy(ap2, ap);
     if(logfile)
         vfprintf(logfile, format, ap);
-    vfprintf(stderr, format, ap2);
+    vfprintf(stdout, format, ap2);
     va_end(ap);
     va_end(ap2);
 }
@@ -201,8 +202,9 @@ void log_info(const char *format, ...) {
         vfprintf(logfile, format, ap);
         fprintf(logfile, "\n");
     }
-    vfprintf(stderr, format, ap2);
-    fprintf(stderr, "\n");
+    vfprintf(stdout, format, ap2);
+    fprintf(stdout, "\n");
+    fflush(stdout);
     va_end(ap);
     va_end(ap2);
 }
@@ -235,15 +237,18 @@ void log_header(const char *message, int failsafe_mode) {
     if(logfile) {
         fprintf(logfile, "\n%s", buf);
     }
-    fprintf(stderr, "\n%s", buf);
+    fprintf(stdout, "\n%s", buf);
+    fflush(stdout);
 
     for(i = 0; i < 72 - length; i++) {
         if(logfile)
             fprintf(logfile, "=");
-        fprintf(stderr, "=");
+        fprintf(stdout, "=");
+        fflush(stdout);
     }
     if(logfile)
         fprintf(logfile, "\n");
-    fprintf(stderr, "\n");
+    fprintf(stdout, "\n");
+    fflush(stdout);
 }
 
