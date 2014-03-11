@@ -776,6 +776,7 @@ int main(int argc, char *argv[]) {
                 log_header("Failsafe roll succeeded", failsafe_mode);
                 log_message("!!! An error occurred during normal roll.\n");
                 log_message("!!! Failsafe mode completed successfully.\n\n");
+                exit_code = 6;
             }
         } else {
             if(exit_code != 0) {
