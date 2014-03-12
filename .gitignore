@@ -28,6 +28,7 @@ Makefile
 /install-sh
 /missing
 /config.h
+/config.h.in
 /config.log
 /autoscan.log
 /configure.scan

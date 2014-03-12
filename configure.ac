@@ -72,7 +72,7 @@ if test "x$LD_START_STATIC" != "x"; then
     AC_CHECK_LIB([z], [gzwrite], CURL_LIBS="$CURL_LIBS -lz")
     AC_CHECK_LIB([cares], [ares_gethostbyname], CURL_LIBS="$CURL_LIBS -lcares")
     AC_CHECK_LIB([idn], [idna_strerror], CURL_LIBS="$CURL_LIBS -lidn")
-    AC_DEFINE([CURL_STATICLIB])
+    AC_DEFINE([CURL_STATICLIB], 1, "Define to 1 if curl is going to be built statically")
 fi
 
 AC_CHECK_LIB([rt], [sched_setscheduler], BASE_LIBS="$BASE_LIBS -lrt")
