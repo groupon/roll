@@ -97,7 +97,8 @@
 #define CONFIGURATE "/usr/local/bin/configurate"
 #define PID_FILE "/var/run/roll.pid"
 
-#define USAGE "usage: roll [options] [hostclass.yml] [host.yml]\n"
+#define USAGE "usage: roll [options] [hostclass.yml] [host.yml] \n" \
+    "Built "BUILD_DATE", version "ROLL_VERSION"\n"
 #define FULL_USAGE USAGE \
     "  -h, --help        display this help and exit\n" \
     "  -f, --failsafe    failsafe mode, for testing\n" \
