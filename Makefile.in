@@ -46,6 +46,10 @@ SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 DEPENDS = $(SOURCES:.c=.d)
 
+ROLL_VERSION := $(shell git describe --abbrev --dirty --always)
+BUILD_DATE := $(shell date +%F)
+CFLAGS += -DROLL_VERSION=\"$(ROLL_VERSION)\" -DBUILD_DATE=\"$(BUILD_DATE)\"
+
 .PHONY: all clean
 
 all: roll

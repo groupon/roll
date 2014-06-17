@@ -59,6 +59,9 @@ if [ -f Makefile ]; then
     make distclean || warn "make distclean returned error, continuing anyway"
 fi
 
+warn "running autoheader..."
+autoheader || die "autoheader failed"
+
 warn "running autoconf..."
 autoconf || die "autoconf failed"
 
