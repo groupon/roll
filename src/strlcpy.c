@@ -24,7 +24,7 @@
     #include <string.h>
 #endif
 
-#ifndef HAVE_STRLCPY
+#if !defined(HAVE_STRLCPY) && !HAVE_DECL_STRLCPY
 #include "strlcpy.h"
 
 /*
@@ -58,4 +58,4 @@ strlcpy(char *dst, const char *src, size_t siz)
         return(s - src - 1);    /* count does not include NUL */
 }
 
-#endif /* !HAVE_STRLCPY */
+#endif /* !defined(HAVE_STRLCPY) && !HAVE_DECL_STRLCPY */
