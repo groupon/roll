@@ -64,7 +64,9 @@
 #include <getopt.h>
 #include <libgen.h>
 #include "log.h"
-#include "strlcpy.h"
+#if !defined(HAVE_STRLCPY) && !HAVE_DECL_STRLCPY
+    #include "strlcpy.h"
+#endif
 #include "config_parse.h"
 #include "environ.h"
 #include "packages.h"

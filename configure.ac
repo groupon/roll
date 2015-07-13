@@ -97,6 +97,7 @@ AC_STRUCT_TIMEZONE
 AC_FUNC_FORK
 AC_CHECK_FUNCS([dup2 localtime_r memset setenv clearenv gethostname mkdir ftruncate strerror])
 AC_CHECK_FUNCS([strlcpy strcspn strdup strstr])
+AC_CHECK_DECLS([strlcpy])
 
 # ==== Output ===============================================================
 # Output
