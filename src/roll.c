@@ -292,6 +292,7 @@ int main(int argc, char *argv[]) {
     FILE *fp = NULL;
     host_config_t host_config;
     hostclass_config_t hostclass_config;
+    package_spec_t *merged_package_list;
     struct stat st;
     char hostclass_file_tmpname[PATH_MAX],  /* "/tmp/hostclass.yml" */
          hostclass_file_name[PATH_MAX],     /* "/usr/local/etc/hostclass.yml" */
@@ -466,6 +467,8 @@ int main(int argc, char *argv[]) {
     if(!parse_hostclass_config(&hostclass_config, hostclass_file)) {
         goto error;
     }
+    merged_package_list = merge_package_lists(hostclass_config.package_list,
+                                              host_config.package_list);
 
     /* === Configuration ======================================== */
     log_header("Configuration", failsafe_mode);
@@ -503,7 +506,7 @@ int main(int argc, char *argv[]) {
     MKPATH_OR_ERROR("package repository", package_stow_dir);
     MKPATH_OR_ERROR("package download", package_download_dir);
     MKPATH_OR_ERROR("package temp", package_temp_dir);
-    if(!download_packages(hostclass_config.package_list,
+    if(!download_packages(merged_package_list,
                           download_groups,
                           download_url_format,
                           package_stow_dir,
@@ -544,7 +547,7 @@ int main(int argc, char *argv[]) {
     RMRF_OR_ERROR("temporary package link", temp_package_link_dir);
     MKPATH_OR_ERROR("temporary package link", temp_package_link_dir);
 
-    if(!create_package_tree(hostclass_config.package_list,
+    if(!create_package_tree(merged_package_list,
                             (failsafe_mode ? failsafe_groups : base_groups),
                             package_stow_dir,
                             temp_package_link_dir))
@@ -734,7 +737,7 @@ int main(int argc, char *argv[]) {
         }
         else if (prune_packages) {
           log_info("Removing unused packages from prior installations.");
-          clean_previous_packages(hostclass_config.package_list,
+          clean_previous_packages(merged_package_list,
                                   package_stow_dir);
         }
     } else {
@@ -746,7 +749,7 @@ int main(int argc, char *argv[]) {
     goto done;
  error:
     if(!failsafe_mode && try_failsafe) {
-        if(hostclass_config.has_failsafe) {
+        if(host_config.has_failsafe || hostclass_config.has_failsafe) {
             failsafe_mode = 1;
             log_message("\n!!! Falling back to failsafe configuration...\n");
             goto failsafe;
@@ -762,6 +765,7 @@ int main(int argc, char *argv[]) {
     host_file = NULL;
     if(host_file_tmpname[0] && !options.host_file)
         unlink(host_file_tmpname);
+    free_host_config(&host_config);
 
     if(hostclass_file)
         fclose(hostclass_file);
@@ -769,6 +773,9 @@ int main(int argc, char *argv[]) {
     if(hostclass_file_tmpname[0] && !options.hostclass_file)
         unlink(hostclass_file_tmpname);
     free_hostclass_config(&hostclass_config);
+
+    if(merged_package_list)
+        free_package_list(merged_package_list);
 
     if(report_errors) {
         if(failsafe_mode) {

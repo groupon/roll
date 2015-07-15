@@ -41,15 +41,17 @@ extern "C" {
 #define FAILSAFE_GROUP_NAME "failsafe"
 #define MAX_VALUE_SIZE 256
 
-typedef struct host_config_s {
-    unsigned char hostclass_tag[MAX_VALUE_SIZE];
-} host_config_t;
-
 typedef struct package_spec_s {
     unsigned char group[MAX_VALUE_SIZE];
     unsigned char package_name[MAX_VALUE_SIZE];
     struct package_spec_s *next;
 } package_spec_t;
+
+typedef struct host_config_s {
+    unsigned char hostclass_tag[MAX_VALUE_SIZE];
+    package_spec_t *package_list;
+    char has_failsafe;
+} host_config_t;
 
 typedef struct os_image_spec_s {
     unsigned char hardware_tag[MAX_VALUE_SIZE];
@@ -65,8 +67,11 @@ typedef struct hostclass_config_s {
 } hostclass_config_t;
 
 int parse_host_config(host_config_t *host_config, FILE *host_file);
+void free_host_config(host_config_t *host_config);
 int parse_hostclass_config(hostclass_config_t *hostclass_config, FILE *hostclass_file);
 void free_hostclass_config(hostclass_config_t *hostclass_config);
+package_spec_t *merge_package_lists(package_spec_t *a, package_spec_t *b);
+void free_package_list(package_spec_t *package_list);
 
 #ifdef __cplusplus
 }
