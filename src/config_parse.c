@@ -172,7 +172,7 @@ int parse_host_config(host_config_t *host_config, FILE *host_file) {
                         strlcpy((char *)package_spec->package_name,
                                 (char *)event.data.scalar.value,
                                 MAX_VALUE_SIZE);
-                    if(!last_package_spec) {
+                        if(!last_package_spec) {
                             host_config->package_list =
                                 package_spec;
                         } else {
