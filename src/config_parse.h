@@ -50,7 +50,7 @@ typedef struct package_spec_s {
 typedef struct host_config_s {
     unsigned char hostclass_tag[MAX_VALUE_SIZE];
     package_spec_t *package_list;
-    char has_failsafe;
+    int has_failsafe;
 } host_config_t;
 
 typedef struct os_image_spec_s {
@@ -63,7 +63,7 @@ typedef struct hostclass_config_s {
     unsigned char host_tag[MAX_VALUE_SIZE];
     os_image_spec_t *os_image_list;
     package_spec_t *package_list;
-    char has_failsafe;
+    int has_failsafe;
 } hostclass_config_t;
 
 int parse_host_config(host_config_t *host_config, FILE *host_file);
