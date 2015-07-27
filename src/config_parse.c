@@ -474,23 +474,23 @@ static int package_basename_match(package_spec_t *a, package_spec_t *b) {
 }
 
 /* merge two package_spec_t linked lists, second overrides first */
-package_spec_t *merge_package_lists(package_spec_t *a, package_spec_t *b) {
+package_spec_t *merge_package_lists(package_spec_t *base, package_spec_t *override) {
     package_spec_t *merged_package_list,
-                   *package_spec, *new_package_spec, *last_package_spec,
+                   *package_spec, *new_package_spec, *last_package_spec = NULL,
                    *merged_package_spec;
     int replaced;
 
     /* copy a into merged package list */
     merged_package_list = NULL;
-    for(package_spec = a; package_spec; package_spec = package_spec->next) {
+    for(package_spec = base; package_spec; package_spec = package_spec->next) {
         new_package_spec = package_spec_dup(package_spec);
         if(!merged_package_list) merged_package_list = new_package_spec;
         if(last_package_spec) last_package_spec->next = new_package_spec;
         last_package_spec = new_package_spec;
     }
 
-    /* merge copies of b into merged package list */
-    for(package_spec = b; package_spec; package_spec = package_spec->next) {
+    /* merge copies of override into merged package list */
+    for(package_spec = override; package_spec; package_spec = package_spec->next) {
         if(!merged_package_list) {
             /* a was empty, so set head of merged list to this copy */
             new_package_spec = package_spec_dup(package_spec);

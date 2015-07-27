@@ -467,6 +467,7 @@ int main(int argc, char *argv[]) {
     if(!parse_hostclass_config(&hostclass_config, hostclass_file)) {
         goto error;
     }
+    log_info("Merging package lists");
     merged_package_list = merge_package_lists(hostclass_config.package_list,
                                               host_config.package_list);
 
