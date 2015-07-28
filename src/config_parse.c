@@ -532,7 +532,6 @@ package_spec_t *merge_package_lists(package_spec_t *base, package_spec_t *overri
                             (char *)package_spec->package_name,
                             MAX_VALUE_SIZE);
                     replaced = 1;
-                    break;
                 }
                 last_package_spec = merged_package_spec;
             }
