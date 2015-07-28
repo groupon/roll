@@ -458,7 +458,18 @@ error:
     return package_spec_dst;
 }
 
-/* do package names match up to the first hyphen (foo-1.2.3 and foo-2.3.4)? */
+/* do package names match up to the first hyphen (foo-1.2.3 and foo-2.3.4)?
+Examples:
+    * matches:
+    ** gcc-1234 gcc-567
+    ** gcc gcc
+    ** gcc gcc-1234
+    ** gcc-123 gcc
+    ** gcc gcc-1234
+    * mismatches
+    ** a b
+    ** a-1 aa-1
+*/
 static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     int i;
 
@@ -470,7 +481,7 @@ static int package_basename_match(package_spec_t *a, package_spec_t *b) {
         if(a->package_name[i] == '-') return 1;
     }
 
-    return 0;
+    return 1;
 }
 
 /* merge two package_spec_t linked lists, second overrides first */
