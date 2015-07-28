@@ -95,6 +95,7 @@ int parse_host_config(host_config_t *host_config, FILE *host_file) {
     yaml_event_t event;
     int ok = 1;
     int done = 0;
+    int current_depth = 0;
     unsigned char last_package_group[MAX_VALUE_SIZE];
     package_spec_t *package_spec = NULL;
     package_spec_t *last_package_spec = NULL;
@@ -138,12 +139,14 @@ int parse_host_config(host_config_t *host_config, FILE *host_file) {
             case YAML_SCALAR_EVENT:
                 switch(parse_state) {
                     case STATE_START:
-                        if(!strcmp("hostclass",
-                                    (char *)event.data.scalar.value)) {
-                            parse_state = STATE_HOSTCLASS_TAG;
-                        } else if(!strcmp("packages",
-                                           (char *)event.data.scalar.value)) {
-                            parse_state = STATE_PACKAGES_GROUP;
+                        if (current_depth == 1) {
+                            if(!strcmp("hostclass",
+                                        (char *)event.data.scalar.value)) {
+                                parse_state = STATE_HOSTCLASS_TAG;
+                            } else if(!strcmp("packages",
+                                               (char *)event.data.scalar.value)) {
+                                parse_state = STATE_PACKAGES_GROUP;
+                            }
                         }
                         break;
                     case STATE_HOSTCLASS_TAG:
@@ -203,8 +206,10 @@ int parse_host_config(host_config_t *host_config, FILE *host_file) {
                 }
                 break;
             case YAML_MAPPING_START_EVENT:
+                current_depth++;
                 break;
             case YAML_MAPPING_END_EVENT:
+                current_depth--;
                 switch(parse_state) {
                     case STATE_START:
                     case STATE_HOSTCLASS_TAG:
@@ -246,6 +251,7 @@ int parse_hostclass_config(hostclass_config_t *hostclass_config, FILE *hostclass
     yaml_event_t event;
     int ok = 1;
     int done = 0;
+    int current_depth = 0;
     unsigned char last_package_group[MAX_VALUE_SIZE];
     package_spec_t *package_spec = NULL;
     package_spec_t *last_package_spec = NULL;
@@ -292,12 +298,14 @@ int parse_hostclass_config(hostclass_config_t *hostclass_config, FILE *hostclass
             case YAML_SCALAR_EVENT:
                 switch(parse_state) {
                     case STATE_START:
-                        if(!strcmp("images",
-                                   (char *)event.data.scalar.value)) {
-                            parse_state = STATE_IMAGES_HARDWARE;
-                        } else if(!strcmp("packages",
-                                           (char *)event.data.scalar.value)) {
-                            parse_state = STATE_PACKAGES_GROUP;
+                        if (current_depth == 1) {
+                            if(!strcmp("images",
+                                       (char *)event.data.scalar.value)) {
+                                parse_state = STATE_IMAGES_HARDWARE;
+                            } else if(!strcmp("packages",
+                                               (char *)event.data.scalar.value)) {
+                                parse_state = STATE_PACKAGES_GROUP;
+                            }
                         }
                         break;
                     case STATE_IMAGES_HARDWARE:
@@ -380,8 +388,10 @@ int parse_hostclass_config(hostclass_config_t *hostclass_config, FILE *hostclass
                 }
                 break;
             case YAML_MAPPING_START_EVENT:
+                current_depth++;
                 break;
             case YAML_MAPPING_END_EVENT:
+                current_depth--;
                 switch(parse_state) {
                     case STATE_START:
                     case STATE_IMAGES_HARDWARE:
