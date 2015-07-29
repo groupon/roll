@@ -469,19 +469,16 @@ error:
 }
 
 /* do package names match up to the first hyphen (foo-1.2.3 and foo-2.3.4)?
-Examples:
-    * matches:
-    ** gcc-1234 gcc-567
-    ** gcc gcc
-    ** gcc gcc-1234
-    ** gcc-123 gcc
-    ** gcc gcc-1234
-    * mismatches
-    ** a b
-    ** a-1 aa-1
-    ** a aa
-    ** aa a
-*/
+ * should match:
+ * - apache-1.3.19 apache-2.2.27
+ * - apache apache-2.2.27
+ * - apache-1.3.19 apache
+ * - apache apache
+ * should not match:
+ * - apache nginx
+ * - apache-1.3.19 apache_ant-1.8.2
+ * - apache apache_ant-1.8.2
+ */
 static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     int i;
 
@@ -489,11 +486,11 @@ static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     if(strcmp((char *)a->group, (char *)b->group)) return 0;
 
     for(i = 0; ; i++) {
-        if((a->package_name[i] == 0   && b->package_name[i] == 0)   ||
-           (a->package_name[i] == 0   && b->package_name[i] == '-') ||
-           (a->package_name[i] == '-' && b->package_name[i] == 0)   ||
-           (a->package_name[i] == '-' && b->package_name[i] == '-')) {
+        /* if all match up until end of string or hyphen, return true */
+        if((a->package_name[i] == 0 || a->package_name[i] == '-') &&
+           (b->package_name[i] == 0 || b->package_name[i] == '-')) {
             return 1;
+        /* if any mismatch, including end of either string, return false */
         } else if(a->package_name[i] != b->package_name[i]) {
             return 0;
         }
