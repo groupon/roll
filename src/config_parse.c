@@ -139,7 +139,7 @@ int parse_host_config(host_config_t *host_config, FILE *host_file) {
             case YAML_SCALAR_EVENT:
                 switch(parse_state) {
                     case STATE_START:
-                        if (current_depth == 1) {
+                        if(current_depth == 1) {
                             if(!strcmp("hostclass",
                                         (char *)event.data.scalar.value)) {
                                 parse_state = STATE_HOSTCLASS_TAG;
@@ -298,7 +298,7 @@ int parse_hostclass_config(hostclass_config_t *hostclass_config, FILE *hostclass
             case YAML_SCALAR_EVENT:
                 switch(parse_state) {
                     case STATE_START:
-                        if (current_depth == 1) {
+                        if(current_depth == 1) {
                             if(!strcmp("images",
                                        (char *)event.data.scalar.value)) {
                                 parse_state = STATE_IMAGES_HARDWARE;
