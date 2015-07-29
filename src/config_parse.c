@@ -479,6 +479,8 @@ Examples:
     * mismatches
     ** a b
     ** a-1 aa-1
+    ** a aa
+    ** aa a
 */
 static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     int i;
@@ -486,12 +488,16 @@ static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     /* if groups don't match, return false */
     if(strcmp((char *)a->group, (char *)b->group)) return 0;
 
-    for(i = 0; a->package_name[i] && b->package_name[i]; i++) {
-        if(a->package_name[i] != b->package_name[i]) return 0;
-        if(a->package_name[i] == '-') return 1;
+    for(i = 0; ; i++) {
+        if((a->package_name[i] == 0   && b->package_name[i] == 0)   ||
+           (a->package_name[i] == 0   && b->package_name[i] == '-') ||
+           (a->package_name[i] == '-' && b->package_name[i] == 0)   ||
+           (a->package_name[i] == '-' && b->package_name[i] == '-')) {
+            return 1;
+        } else if(a->package_name[i] != b->package_name[i]) {
+            return 0;
+        }
     }
-
-    return 1;
 }
 
 /* merge two package_spec_t linked lists, second overrides first */
