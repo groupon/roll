@@ -497,56 +497,50 @@ static int package_basename_match(package_spec_t *a, package_spec_t *b) {
     }
 }
 
-/* merge two package_spec_t linked lists, second overrides first */
-package_spec_t *merge_package_lists(package_spec_t *base, package_spec_t *override) {
-    package_spec_t *merged_package_list,
-                   *package_spec, *new_package_spec, *last_package_spec = NULL,
-                   *merged_package_spec;
-    int replaced;
+/* merge or append a single package_spec_t onto existing package_spec_t list */
+void append_package_spec(package_spec_t **list, package_spec_t *addition) {
+    package_spec_t *package_spec, *new_package_spec, *last_package_spec = NULL;
+    int replaced = 0;
 
-    /* copy a into merged package list */
-    merged_package_list = NULL;
-    for(package_spec = base; package_spec; package_spec = package_spec->next) {
-        new_package_spec = package_spec_dup(package_spec);
-        if(!merged_package_list) merged_package_list = new_package_spec;
-        if(last_package_spec) last_package_spec->next = new_package_spec;
-        last_package_spec = new_package_spec;
+    /* try to merge package addition into existing list */
+    for(package_spec = *list; package_spec; package_spec = package_spec->next) {
+        if(package_basename_match(package_spec, addition)) {
+            log_info("  Overriding %s package %s with %s",
+                     package_spec->group,
+                     package_spec->package_name,
+                     addition->package_name);
+             strlcpy((char *)package_spec->package_name,
+                     (char *)addition->package_name,
+                     MAX_VALUE_SIZE);
+             replaced = 1;
+        }
+        last_package_spec = package_spec;
     }
 
-    /* merge copies of override into merged package list */
+    /* if we did not replace a package, insert new package at end */
+    if(!replaced) {
+        new_package_spec = package_spec_dup(addition);
+        log_info("  Adding %s package %s",
+                 new_package_spec->group,
+                 new_package_spec->package_name);
+        if(!*list) *list = new_package_spec;
+        if(last_package_spec) last_package_spec->next = new_package_spec;
+    }
+}
+
+/* merge two package_spec_t linked lists, second overrides first */
+package_spec_t *merge_package_lists(package_spec_t *base, package_spec_t *override) {
+    package_spec_t *merged_package_list, *package_spec;
+
+    /* merge base packages into merged package list */
+    merged_package_list = NULL;
+    for(package_spec = base; package_spec; package_spec = package_spec->next) {
+        append_package_spec(&merged_package_list, package_spec);
+    }
+
+    /* merge override packages into merged package list */
     for(package_spec = override; package_spec; package_spec = package_spec->next) {
-        if(!merged_package_list) {
-            /* a was empty, so set head of merged list to this copy */
-            new_package_spec = package_spec_dup(package_spec);
-            merged_package_list = new_package_spec;
-        } else {
-            /* loop through packages to find a package to replace */
-            replaced = 0;
-            last_package_spec = NULL;
-            for(merged_package_spec = merged_package_list;
-                merged_package_spec;
-                merged_package_spec = merged_package_spec->next) {
-                if(package_basename_match(package_spec, merged_package_spec)) {
-                    log_info("  Overriding %s package %s with %s",
-                             merged_package_spec->group,
-                             merged_package_spec->package_name,
-                             package_spec->package_name);
-                    strlcpy((char *)merged_package_spec->package_name,
-                            (char *)package_spec->package_name,
-                            MAX_VALUE_SIZE);
-                    replaced = 1;
-                }
-                last_package_spec = merged_package_spec;
-            }
-            /* if we did not replace a package, insert new package at end */
-            if(!replaced) {
-                new_package_spec = package_spec_dup(package_spec);
-                log_info("  Adding %s package %s",
-                         new_package_spec->group,
-                         new_package_spec->package_name);
-                last_package_spec->next = new_package_spec;
-            }
-        }
+        append_package_spec(&merged_package_list, package_spec);
     }
 
     return merged_package_list;
