@@ -292,7 +292,7 @@ int main(int argc, char *argv[]) {
     FILE *fp = NULL;
     host_config_t host_config;
     hostclass_config_t hostclass_config;
-    package_spec_t *merged_package_list;
+    package_spec_t *merged_package_list = NULL;
     struct stat st;
     char hostclass_file_tmpname[PATH_MAX],  /* "/tmp/hostclass.yml" */
          hostclass_file_name[PATH_MAX],     /* "/usr/local/etc/hostclass.yml" */
